@@ -1,32 +1,40 @@
 # job-hunt-skills
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+**English** | [**中文**](./README.zh-CN.md)
 
-Hermes Agent 技能包 —— BOSS直聘自动化求职助手。通过 API 抓取推荐职位，智能匹配评分，生成个性化招呼语，每日推送到飞书/Telegram。
+Hermes Agent skills for automated job hunting on [BOSS直聘](https://www.zhipin.com) (Boss Zhipin) — China's largest tech recruitment platform. Scrape recommended jobs via API, score match quality, generate personalized greetings, and push results to Feishu/Telegram daily.
 
-## 功能
+## What It Does
 
-- **boss-greeting** — 个性化招呼语生成器，根据 JD 定制 3 版招呼语（经验直击 / 成果展示 / 实战亮剑）
-- **boss-scraper** — API 职位抓取 + 匹配评分 + 批量招呼语生成 + 飞书/Telegram 推送
+- **boss-greeting** — Personalized greeting generator. Produces 3 tailored versions (experience-driven / achievement-showcase / straight-shooter) for each job, 80-120 chars, with JD keyword matching.
+- **boss-scraper** — API-based job scraper with match scoring (1-10), batch greeting generation, and daily push to messaging platforms.
 
-**亮点：**
-- 匹配度评分（1-10），只推送值得投的职位
-- 3 种风格招呼语，80-120 字，含 JD 关键词复现
-- Cookie 认证，不碰浏览器，绕过验证码
-- 内置反爬策略（限频、限次、固定 UA）
-- 每日定时推送，复制招呼语手动发送
+**Why this exists:** Instead of scrolling through hundreds of irrelevant listings, let the agent filter, score, and draft your outreach — you just copy and send.
 
-## 安装
+## Features
 
-### 前提
+- Match scoring (1-10) based on your profile vs JD — only shows jobs worth applying to
+- 3 greeting styles per job, 80-120 chars, with JD keywords baked in
+- Cookie-based API auth — no browser automation, no CAPTCHA headaches
+- Built-in anti-detection (rate limiting, request caps, fixed User-Agent)
+- Daily cron scan with results pushed to Feishu or Telegram
+- Fully customizable scoring weights, greeting templates, and user profile
 
-- 已部署 [Hermes Agent](https://github.com/openclaw/openclaw) 并连接飞书或 Telegram
-- Firefox 浏览器（用于导出 cookies）
+## Install
 
-### 方式一：直接下载 SKILL.md
+### Prerequisites
+
+- [Hermes Agent](https://github.com/openclaw/openclaw) deployed and connected to Feishu or Telegram
+- Firefox browser (for cookie export)
+
+### Option 1: Download SKILL.md directly
 
 ```bash
-# 下载到 Hermes skills 目录（本地部署）
+# Local deployment
+mkdir -p ~/.hermes/skills/career/boss-greeting
+mkdir -p ~/.hermes/skills/career/boss-scraper
+
 curl -o ~/.hermes/skills/career/boss-greeting/SKILL.md \
   https://raw.githubusercontent.com/hotalexnet/job-hunt-skills/main/skills/career/boss-greeting/SKILL.md
 
@@ -35,7 +43,7 @@ curl -o ~/.hermes/skills/career/boss-scraper/SKILL.md \
 ```
 
 ```bash
-# Docker 部署（假设挂载 /root/.hermes → /opt/data）
+# Docker deployment (volume mount: /root/.hermes → /opt/data)
 doas mkdir -p /root/.hermes/skills/career/boss-greeting
 doas mkdir -p /root/.hermes/skills/career/boss-scraper
 
@@ -45,69 +53,68 @@ doas curl -o /root/.hermes/skills/career/boss-greeting/SKILL.md \
 doas curl -o /root/.hermes/skills/career/boss-scraper/SKILL.md \
   https://raw.githubusercontent.com/hotalexnet/job-hunt-skills/main/skills/career/boss-scraper/SKILL.md
 
-# 重启 Hermes 加载技能
+# Restart Hermes to load new skills
 doas docker restart hermes hermes-dashboard
 ```
 
-安装后在飞书发送 `/reload-skills` 刷新。
+After installing, send `/reload-skills` in Feishu to refresh.
 
-### 方式二：克隆仓库
+### Option 2: Clone the repo
 
 ```bash
 git clone https://github.com/hotalexnet/job-hunt-skills.git
-# 将 skills/ 目录复制到 Hermes skills 路径
 cp -r job-hunt-skills/skills/career/ ~/.hermes/skills/career/
 ```
 
-## 配置
+## Setup
 
-### 1. 设置个人画像
+### 1. Configure your profile
 
-在 Hermes 对话中告诉它你的背景，例如：
+Tell Hermes about your background in a conversation:
 
-> 我的背景：X年技术经验，专注AI Agent方向，技术栈包括 LangChain/RAG/向量检索。求职方向：AI Agent 工程师，远程优先。
+> "My profile: X years tech experience, focused on AI Agent, tech stack includes LangChain/RAG/vector search. Looking for: AI Agent engineer roles, remote preferred."
 
-Hermes 会记住这些信息用于招呼语生成和匹配评分。
+Hermes remembers this for scoring and greeting generation.
 
-### 2. 导出 BOSS直聘 Cookies
+### 2. Export BOSS直聘 cookies
 
-先在 Firefox 中登录 [zhipin.com](https://www.zhipin.com)，然后：
+Login to [zhipin.com](https://www.zhipin.com) in Firefox, then:
 
 ```bash
-# 导出 cookies
+# Export cookies
 python3 scripts/boss-cookie.py export
 
-# 复制到 Hermes 数据目录
-# Docker 部署：
+# Copy to Hermes data directory
+# Docker:
 doas cp ~/.hermes/boss-cookies.json /root/.hermes/boss-cookies.json
 
-# 本地部署：
+# Local:
 cp ~/.hermes/boss-cookies.json ~/.hermes/boss-cookies.json
 ```
 
-### 3. 测试
+### 3. Test
 
-在飞书/Telegram 对 Hermes 说：
+Say this to Hermes in Feishu/Telegram:
 
 ```
 帮我看看BOSS直聘有什么新职位
 ```
 
-### 4. 设置每日定时推送（可选）
+### 4. Set up daily cron (optional)
 
 ```
 hermes cron add "0 9 * * *" "帮我看看BOSS直聘上今天有什么新职位" --platform feishu
 ```
 
-## 使用
+## Usage
 
-| 触发方式 | 动作 |
-|---------|------|
-| "帮我看看新职位" / "扫描BOSS直聘" | 抓取推荐职位 → 评分 → 生成招呼语 → 推送 |
-| 粘贴一段 JD | 针对该职位生成 3 版招呼语 |
-| 每日 09:00 定时任务 | 自动扫描并推送结果到飞书 |
+| Trigger | Action |
+|---------|--------|
+| "帮我看看新职位" / "扫描BOSS直聘" | Scrape → score → generate greetings → push |
+| Paste a JD | Generate 3 greeting versions for that specific job |
+| Cron (daily 9:00) | Auto scan and push results |
 
-**推送示例：**
+**Sample push output:**
 
 ```
 📋 BOSS直聘日报 | 扫描30个，匹配5个
@@ -122,74 +129,75 @@ hermes cron add "0 9 * * *" "帮我看看BOSS直聘上今天有什么新职位" 
    > ...
 ```
 
-## 工作原理
+## How It Works
 
 ```
-BOSS直聘推荐 API (只读，无验证码)
+BOSS直聘 Recommend API (read-only, no CAPTCHA)
     ↓
-职位列表 → 匹配度评分 (1-10)
+Job list → Match scoring (1-10)
     ↓
-≥6分的职位 → 生成个性化招呼语 (80-120字)
+Jobs scoring ≥6 → Personalized greeting generation (80-120 chars)
     ↓
-推送到飞书 / Telegram
+Push to Feishu / Telegram
     ↓
-用户复制招呼语 → 在 BOSS直聘 手动发送
+User copies greeting → Sends manually in BOSS直聘 app
 ```
 
-**为什么不自动发送？** BOSS直聘对自动发送有严格的反机器人检测（动态令牌 + 图标验证码），自动发送有封号风险。本项目定位是「筛选+生成」，发送环节由用户手动完成。
+**Why manual sending?** BOSS直聘 has aggressive anti-bot detection for write operations (dynamic tokens + icon-selection CAPTCHA). Auto-sending risks account bans. This tool focuses on screening + drafting; the actual sending is done by you.
 
-## Cookie 刷新
+## Cookie Refresh
 
-Cookies 有效期约 7-30 天。过期时 API 会报错，按以下步骤刷新：
+Cookies expire every 7-30 days. When the API returns errors:
 
-1. 在 Firefox 中重新登录 zhipin.com
-2. 运行 `python3 scripts/boss-cookie.py export`
-3. 复制到 Hermes 数据目录
+1. Re-login to zhipin.com in Firefox
+2. Run `python3 scripts/boss-cookie.py export`
+3. Copy to Hermes data directory
 
-## 匹配评分规则
+## Match Scoring
 
-| 因素 | 权重 | 规则 |
-|------|------|------|
-| 方向匹配 | 40% | AI Agent/智能体/LLM/RAG/LangChain/自动化 |
-| 技术栈 | 30% | Python/Linux/Docker/向量检索/Claude/GPT/全栈，每个+1，上限+3 |
-| 城市 | 15% | 远程+2，一线城市+1 |
-| 薪资 | 10% | ≥40K +1, 25-40K 0, <25K -1 |
-| 角色 | 5% | 合伙人/CTO/总监 +1 |
+| Factor | Weight | Rules |
+|--------|--------|-------|
+| Direction | 40% | AI Agent / LLM / RAG / LangChain / Automation |
+| Tech stack | 30% | Python/Linux/Docker/vector search/Claude/GPT/full-stack, +1 each, max +3 |
+| Location | 15% | Remote +2, Tier-1 city +1 |
+| Salary | 10% | ≥40K +1, 25-40K 0, <25K -1 |
+| Role level | 5% | Co-founder/CTO/VP +1 |
 
-评分可在 SKILL.md 中自定义调整权重和关键词。
+Weights and keywords are fully customizable in the SKILL.md files.
 
-## 自定义
+## Customization
 
-- **匹配评分**：编辑 `boss-scraper/SKILL.md` 中 Step 3 的评分表
-- **招呼语风格**：编辑 `boss-greeting/SKILL.md` 中 Step 3 的模板和原则
-- **用户画像**：在 Hermes 对话中直接更新，它会记住
-- **推送时间**：修改 cron 表达式
+- **Scoring rules**: Edit the scoring table in `boss-scraper/SKILL.md` Step 3
+- **Greeting styles**: Edit templates and principles in `boss-greeting/SKILL.md` Step 3
+- **User profile**: Update directly in Hermes conversation — it remembers
+- **Push schedule**: Modify the cron expression
 
-## 项目结构
+## Project Structure
 
 ```
 job-hunt-skills/
-├── README.md
+├── README.md                    # This file (English)
+├── README.zh-CN.md              # 中文文档
 ├── LICENSE
 ├── scripts/
-│   └── boss-cookie.py          # Cookie 导出工具
+│   └── boss-cookie.py           # Cookie export tool
 └── skills/
     └── career/
         ├── boss-greeting/
-        │   └── SKILL.md        # 招呼语生成技能
+        │   └── SKILL.md         # Greeting generation skill
         └── boss-scraper/
-            └── SKILL.md        # 职位抓取+评分+推送技能
+            └── SKILL.md         # Job scraping + scoring + push skill
 ```
 
-## 许可证
+## License
 
 [MIT License](LICENSE)
 
-## 致谢
+## Acknowledgments
 
-- [Hermes Agent](https://github.com/openclaw/openclaw) — AI Agent 框架
-- [BOSS直聘](https://www.zhipin.com) — 职位数据来源
+- [Hermes Agent](https://github.com/openclaw/openclaw) — AI Agent framework
+- [BOSS直聘](https://www.zhipin.com) — Job data source
 
 ---
 
-⚠️ **免责声明**：本项目仅供学习交流使用。使用时请遵守 BOSS直聘的用户协议和相关法律法规。因使用本项目导致的任何问题，开发者不承担责任。
+⚠️ **Disclaimer**: This project is for educational purposes only. Please comply with BOSS直聘's Terms of Service and applicable laws. The developer assumes no liability for any issues arising from the use of this project.

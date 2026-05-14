@@ -7,13 +7,14 @@ BOSS直聘 Cookie 导出/注入工具
 2. 运行: python3 boss-cookie.py export
    → 从 Firefox 的 cookies.sqlite 导出 zhipin.com 的 cookies
 3. 运行: python3 boss-cookie.py inject
-   → 通过 Hermes browser_cdp 注入到 Hermes 的浏览器 session
+   → 生成 browser_cdp 注入命令，供 Hermes skill 使用
 
-也可以手动方式：
+手动导出方式：
 1. 在浏览器中登录 zhipin.com
 2. F12 → Application → Cookies → 复制所有 cookie
-3. 保存为 JSON 文件: [{"name":"xx","value":"xx","domain":".zhipin.com",...}, ...]
-4. 运行: python3 boss-cookie.py inject-file cookies.json
+3. 保存为 JSON 文件: ~/.hermes/boss-cookies.json
+
+命令: python3 boss-cookie.py [export|inject|help]
 """
 
 import json
@@ -44,7 +45,7 @@ def export_firefox_cookies():
             continue
         for entry in os.listdir(profile_dir):
             full = os.path.join(profile_dir, entry)
-            if os.path.isdir(full) and "default" in entry.lower() or os.path.exists(os.path.join(full, "cookies.sqlite")):
+            if os.path.isdir(full) and ("default" in entry.lower() or os.path.exists(os.path.join(full, "cookies.sqlite"))):
                 cookies_db = os.path.join(full, "cookies.sqlite")
                 if not os.path.exists(cookies_db):
                     continue
@@ -84,7 +85,7 @@ def export_firefox_cookies():
                 finally:
                     try:
                         os.unlink(tmp_db)
-                    except:
+                    except OSError:
                         pass
 
                 if cookies:

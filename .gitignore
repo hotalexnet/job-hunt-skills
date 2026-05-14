@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.pyo
+*.sqlite
+boss-cookies.json
+.DS_Store

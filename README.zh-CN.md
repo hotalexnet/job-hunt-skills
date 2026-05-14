@@ -1,6 +1,9 @@
 # job-hunt-skills
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/hotalexnet/job-hunt-skills?style=social)](https://github.com/hotalexnet/job-hunt-skills/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/hotalexnet/job-hunt-skills)](https://github.com/hotalexnet/job-hunt-skills/commits/main)
+[![Runtime: Python 3](https://img.shields.io/badge/runtime-python3-blue.svg)](https://www.python.org/)
 [**English**](./README.md) | **中文**
 
 Hermes Agent 技能包 —— BOSS直聘自动化求职助手。通过 API 抓取推荐职位，智能匹配评分，生成个性化招呼语，每日推送到飞书/Telegram。

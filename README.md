@@ -1,13 +1,16 @@
 # job-hunt-skills
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/hotalexnet/job-hunt-skills?style=social)](https://github.com/hotalexnet/job-hunt-skills/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/hotalexnet/job-hunt-skills)](https://github.com/hotalexnet/job-hunt-skills/commits/main)
+[![Runtime: Python 3](https://img.shields.io/badge/runtime-python3-blue.svg)](https://www.python.org/)
 **English** | [**中文**](./README.zh-CN.md)
 
 Hermes Agent skills for automated job hunting on [BOSS直聘](https://www.zhipin.com) (Boss Zhipin) — China's largest tech recruitment platform. Scrape recommended jobs via API, score match quality, generate personalized greetings, and push results to Feishu/Telegram daily.
 
 ## What It Does
 
-- **boss-greeting** — Personalized greeting generator. Produces 3 tailored versions (experience-driven / achievement-showcase / straight-shooter) for each job, 80-120 chars, with JD keyword matching.
+- **boss-greeting** — Personalized greeting generator. Produces 3 tailored versions (experience-driven / achievement-showcase / straight-shooter) for each job, 80-120 Chinese characters, with JD keyword matching.
 - **boss-scraper** — API-based job scraper with match scoring (1-10), batch greeting generation, and daily push to messaging platforms.
 
 **Why this exists:** Instead of scrolling through hundreds of irrelevant listings, let the agent filter, score, and draft your outreach — you just copy and send.
@@ -15,7 +18,7 @@ Hermes Agent skills for automated job hunting on [BOSS直聘](https://www.zhipin
 ## Features
 
 - Match scoring (1-10) based on your profile vs JD — only shows jobs worth applying to
-- 3 greeting styles per job, 80-120 chars, with JD keywords baked in
+- 3 greeting styles per job, 80-120 Chinese characters, with JD keywords baked in
 - Cookie-based API auth — no browser automation, no CAPTCHA headaches
 - Built-in anti-detection (rate limiting, request caps, fixed User-Agent)
 - Daily cron scan with results pushed to Feishu or Telegram
@@ -136,7 +139,7 @@ BOSS直聘 Recommend API (read-only, no CAPTCHA)
     ↓
 Job list → Match scoring (1-10)
     ↓
-Jobs scoring ≥6 → Personalized greeting generation (80-120 chars)
+Jobs scoring ≥6 → Personalized greeting generation (80-120 characters)
     ↓
 Push to Feishu / Telegram
     ↓
